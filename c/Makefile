@@ -218,3 +218,32 @@ $(BUILD_PATH)/%.o: $(SRC_PATH)/%.$(SRC_EXT)
 	$(CMD_PREFIX)$(CC) $(CFLAGS) $(INCLUDES) -MP -MMD -c $< -o $@
 	@echo -en "\t Compile time: "
 	@$(END_TIME)
+
+.PHONY: tags
+tags:
+	@echo "Generating ctags"
+ifeq ($(V),true)
+	$(shell echo "$(CC) $(COMPILE_FLAGS) -M $(SOURCES) \
+			| sed -e 's/[\\ ]/\n/g' \
+			| sed -e '/^$$/d' -e '/\.o:[ \t]*$$/d' \
+			| ctags -L - --c++-kinds=+p --fields=+iaS --extra=+q")
+endif
+	$(shell $(CC) $(COMPILE_FLAGS) -M $(SOURCES) \
+			| sed -e 's/[\\ ]/\n/g' \
+			| sed -e '/^$$/d' -e '/\.o:[ \t]*$$/d' \
+			| ctags -L - --c++-kinds=+p --fields=+iaS --extra=+q)
+
+.PHONY: cscope
+cscope:
+	@echo "Generating cscope"
+ifeq ($(V),true)
+	$(shell echo "$(CC) $(COMPILE_FLAGS) -M $(SOURCES) \
+			| sed -e 's/[\\ ]/\n/g' \
+			| sed -e '/^$$/d' -e '/\.o:[ \t]*$$/d' \
+			| cscope -bq")
+endif
+	$(shell $(CC) $(COMPILE_FLAGS) -M $(SOURCES) \
+			| sed -e 's/[\\ ]/\n/g' \
+			| sed -e '/^$$/d' -e '/\.o:[ \t]*$$/d' \
+			| cscope -bq -i -)
+
